@@ -512,13 +512,16 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
     [self updateSessionAudioIsMuted:!!options[@"mute"]];
 
     AVCaptureConnection *connection = [self.movieFileOutput connectionWithMediaType:AVMediaTypeVideo];
-    if (self.videoStabilizationMode != 0) {
-        if (connection.isVideoStabilizationSupported == NO) {
-            RCTLogWarn(@"%s: Video Stabilization is not supported on this device.", __func__);
-        } else {
-            [connection setPreferredVideoStabilizationMode:self.videoStabilizationMode];
-        }
-    }
+    // if (self.videoStabilizationMode != 0) {
+    //     if (connection.isVideoStabilizationSupported == NO) {
+    //         RCTLogWarn(@"%s: Video Stabilization is not supported on this device.", __func__);
+    //     } else {
+            
+    //     }
+    // }else{
+    //     RCTLogWarn(@"%s: WTF FFFF!!!!!!!.", __func__);
+    // }
+    [connection setPreferredVideoStabilizationMode:2];
     [connection setVideoOrientation:orientation];
 
     if (options[@"codec"]) {
@@ -695,6 +698,7 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
             [self updateWhiteBalance];
             [self.previewLayer.connection setVideoOrientation:orientation];
             [self _updateMetadataObjectsToRecognize];
+            [self.previewLayer.connection setPreferredVideoStabilizationMode:2];
         }
 
         [self.session commitConfiguration];
