@@ -203,6 +203,30 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
     [device unlockForConfiguration];
 }
 
+- (void)updateFPS
+{
+    BOOL isFPSSupported = NO;
+    AVCaptureDevice *device = [self.videoCaptureDeviceInput device];
+    AVCaptureDeviceFormat *currentFormat = [device activeFormat];
+    for ( AVFrameRateRange *range in currentFormat.videoSupportedFrameRateRanges ) {
+        if ( range.maxFrameRate >= 24 && range.minFrameRate <= 24 )        {
+            isFPSSupported = YES;
+            break;
+        }
+    }
+
+    if( isFPSSupported ) {
+        if ( [device lockForConfiguration:NULL] ) {
+            device.activeVideoMaxFrameDuration = CMTimeMake( 1, 24 );
+            device.activeVideoMinFrameDuration = CMTimeMake( 1, 24 );
+            [device unlockForConfiguration];
+        }
+    }
+    else {
+        RCTLogWarn(@"FPS not supported");
+    }
+}
+
 - (void)updateAutoFocusPointOfInterest
 {
     AVCaptureDevice *device = [self.videoCaptureDeviceInput device];
@@ -523,6 +547,14 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
     // }
     [connection setPreferredVideoStabilizationMode:2];
     [connection setVideoOrientation:orientation];
+    // if (connection.isVideoMinFrameDurationSupported){
+    //   connection.videoMinFrameDuration = CMTimeMake(1, 24);
+    // }
+        
+    // if (connection.isVideoMaxFrameDurationSupported){
+    //   connection.videoMaxFrameDuration = CMTimeMake(1, 24);
+    // }
+        
 
     if (options[@"codec"]) {
       if (@available(iOS 10, *)) {
@@ -699,6 +731,7 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
             [self.previewLayer.connection setVideoOrientation:orientation];
             [self _updateMetadataObjectsToRecognize];
             [self.previewLayer.connection setPreferredVideoStabilizationMode:2];
+            [self updateFPS];
         }
 
         [self.session commitConfiguration];
