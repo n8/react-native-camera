@@ -570,6 +570,8 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
 
     dispatch_async(self.sessionQueue, ^{
         [self updateFlashMode];
+        [self updateFPS]; 
+        
         NSString *path = nil;
         if (options[@"path"]) {
             path = options[@"path"];
