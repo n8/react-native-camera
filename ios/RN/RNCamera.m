@@ -570,8 +570,7 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
 
     dispatch_async(self.sessionQueue, ^{
         [self updateFlashMode];
-        [self updateFPS]; 
-        
+        [self updateFPS];
         NSString *path = nil;
         if (options[@"path"]) {
             path = options[@"path"];
@@ -624,7 +623,15 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
             return;
         }
 
-        self.session.sessionPreset = AVCaptureSessionPresetPhoto;
+        // self.session.sessionPreset = AVCaptureSessionPreset3840x2160;
+
+        AVCaptureDevice *device = [self.videoCaptureDeviceInput device];
+        if (device.position == RNCameraTypeFront){
+            self.session.sessionPreset = AVCaptureSessionPreset1920x1080;
+        }
+        else {
+            self.session.sessionPreset = AVCaptureSessionPreset3840x2160;
+        }
 
         AVCaptureStillImageOutput *stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
         if ([self.session canAddOutput:stillImageOutput]) {
@@ -745,7 +752,7 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
 - (void)updateSessionPreset:(AVCaptureSessionPreset)preset
 {
 #if !(TARGET_IPHONE_SIMULATOR)
-    if ([preset integerValue] < 0) {
+    if ([preset integerValue] < 0 || self.session.sessionPreset == preset) {
         return;
     }
     if (preset) {
@@ -982,8 +989,12 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
         [self setupOrDisableTextDetector];
     }
 
-    if (self.session.sessionPreset != AVCaptureSessionPresetPhoto) {
-        [self updateSessionPreset:AVCaptureSessionPresetPhoto];
+    AVCaptureDevice *device = [self.videoCaptureDeviceInput device];
+    if (device.position == RNCameraTypeFront){
+        [self updateSessionPreset:AVCaptureSessionPreset1920x1080];
+    }
+    else {
+        [self updateSessionPreset:AVCaptureSessionPreset3840x2160];
     }
 }
 
