@@ -940,25 +940,30 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
             success = [value boolValue];
         }
     }
-    if (success && self.videoRecordedResolve != nil) {
-      if (@available(iOS 10, *)) {
-          AVVideoCodecType videoCodec = self.videoCodecType;
-          if (videoCodec == nil) {
-              videoCodec = [self.movieFileOutput.availableVideoCodecTypes firstObject];
-          }
-          if ([connections[0] isVideoMirrored]) {
-            [self mirrorVideo:outputFileURL completion:^(NSURL *mirroredURL) {
-                self.videoRecordedResolve(@{ @"uri": mirroredURL.absoluteString, @"codec":videoCodec });
-            }];
-          } else {
-            self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString, @"codec":videoCodec });
-          }
-      } else {
-          self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString });
-      }
-    } else if (self.videoRecordedReject != nil) {
+    if (outputFileURL == nil) {
         self.videoRecordedReject(@"E_RECORDING_FAILED", @"An error occurred while recording a video.", error);
+    } else {
+         if (success && self.videoRecordedResolve != nil) {
+          if (@available(iOS 10, *)) {
+              AVVideoCodecType videoCodec = self.videoCodecType;
+              if (videoCodec == nil) {
+                  videoCodec = [self.movieFileOutput.availableVideoCodecTypes firstObject];
+              }
+              if ([connections[0] isVideoMirrored]) {
+                [self mirrorVideo:outputFileURL completion:^(NSURL *mirroredURL) {
+                    self.videoRecordedResolve(@{ @"uri": mirroredURL.absoluteString, @"codec":videoCodec });
+                }];
+              } else {
+                self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString, @"codec":videoCodec });
+              }
+          } else {
+              self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString });
+          }
+        } else if (self.videoRecordedReject != nil) {
+            self.videoRecordedReject(@"E_RECORDING_FAILED", @"An error occurred while recording a video.", error);
+        }       
     }
+
 
     [self cleanupCamera];
 
