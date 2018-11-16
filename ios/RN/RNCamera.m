@@ -940,7 +940,7 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
             success = [value boolValue];
         }
     }
-    if (outputFileURL == nil) {
+    if (outputFileURL == nil || outputFileURL.absoluteString == nil) {
         self.videoRecordedReject(@"E_RECORDING_FAILED", @"An error occurred while recording a video.", error);
     } else {
          if (success && self.videoRecordedResolve != nil) {
