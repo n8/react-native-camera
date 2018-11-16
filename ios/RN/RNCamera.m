@@ -954,7 +954,11 @@ static NSDictionary *defaultFaceDetectorOptions = nil;
                     self.videoRecordedResolve(@{ @"uri": mirroredURL.absoluteString, @"codec":videoCodec });
                 }];
               } else {
-                self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString, @"codec":videoCodec });
+                if (outputFileURL.absoluteString == nil || videoCodec == nil) {
+                    self.videoRecordedReject(@"E_RECORDING_FAILED", @"An error occurred while recording a video.", error);
+                } else {
+                    self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString, @"codec":videoCodec });
+                }
               }
           } else {
               self.videoRecordedResolve(@{ @"uri": outputFileURL.absoluteString });
